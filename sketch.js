@@ -1,12 +1,22 @@
 // crio as variaveis
 var trex
 var trexCorrendo
+var trexMorto
 var bordas
 var chao
 var chaoImagem
 var chaoInvisivel
 var nuvemImagem
 var cacto1,cacto2,cacto3,cacto4,cacto5,cacto6
+var estado='jogando'
+var grupoCacto,grupoNuvem
+var pontuacao=0
+var gameOver,gameOverImagem
+var restart,restartImagem
+var die
+var checkpoint
+var jump
+
 
 function cactos(){
  if(frameCount % 110 === 0){
@@ -33,7 +43,8 @@ case 6: cacto.addImage(cacto6)
 break   
 default:break 
 }
-
+    grupoCacto.add(cacto)
+    
 
  } 
 }
@@ -50,12 +61,14 @@ if(frameCount % 60 === 0){
     nuvem.depth=trex.depth
     trex.depth=trex.depth+1
     nuvem.lifetime=350
+    grupoNuvem.add(nuvem)
 }
 }
 
 // serve para precarregar imagens/animacoes/sons
 function preload(){
     trexCorrendo = loadAnimation('trex1.png', 'trex2.png', 'trex3.png')
+    trexMorto = loadAnimation('trex_collided.png')
     chaoImagem=loadImage('ground2.png')
     nuvemImagem=loadImage("cloud.png")
     cacto1=loadImage('obstacle1.png')
@@ -64,6 +77,11 @@ function preload(){
     cacto4=loadImage('obstacle4.png')
     cacto5=loadImage('obstacle5.png')
     cacto6=loadImage('obstacle6.png')
+    restartImagem=loadImage('restart.png')
+    gameOverImagem=loadImage('gameOver.png')
+    jump=loadSound('jump.mp3')
+    die=loadSound('die.mp3')
+    checkpoint=loadSound('checkPoint.mp3')
 }
 
 
@@ -73,6 +91,7 @@ function setup() {
 
     trex = createSprite(50, 150, 20, 50)
     trex.addAnimation('correndo', trexCorrendo)
+    trex.addAnimation('morto',trexMorto)
     trex.scale=0.8
 
 var aleatorio=Math.round(random(10,100))
@@ -85,26 +104,65 @@ console.log(aleatorio)
     
     chaoInvisivel=createSprite(300,200,600,10)
 chaoInvisivel.visible=false
+
+grupoCacto= new Group()
+grupoNuvem= new Group()
+restart = createSprite(300,100,50,50)
+restart.addImage(restartImagem)
+restart.visible=false
+restart.scale=0.6
+
+gameOver = createSprite(300,40,50,50)
+gameOver.addImage(gameOverImagem)
+gameOver.visible=false
+gameOver.scale=0.7
 }
 
 // serve para fazer o jogo funcionar o tempo todo (é executada o tempo todo, infinitamente até eu parar o jogo)
 function draw() {
     background('white')
 
-    if (keyDown('space') && trex.y>120) {
-        trex.velocityY = -10
-    }
-    nuvens()
-    cactos()
+    text('pontuação: '+pontuacao,20,40)    
+    
 
     trex.velocityY = trex.velocityY + 0.5
 
+
+
     trex.collide(chaoInvisivel)
 
-    chao.velocityX=-5
+  
 
-    if(chao.x<0){
-chao.x=width/2
+    
+
+    if (estado === 'jogando'){
+        if (keyDown('space') && trex.y>120) {
+            trex.velocityY = -10
+            jump.play()
+        }
+
+        pontuacao = pontuacao + Math.round(frameRate()/60)
+
+        nuvens()
+        cactos()
+        chao.velocityX=-5
+        if(chao.x<0){
+            chao.x=width/2
+                }
+if (trex.isTouching(grupoCacto)){
+estado='perdeu'
+trex.changeAnimation('morto',trexMorto)
+die.play()
+}
+
+    } else if(estado === 'perdeu'){
+        chao.velocityX=0
+        grupoCacto.setVelocityXEach(0)
+        grupoNuvem.setVelocityXEach(0)
+        grupoCacto.setLifetimeEach(-1)
+        grupoNuvem.setLifetimeEach(-1)
+        gameOver.visible=true
+        restart.visible=true
     }
 
     drawSprites()
