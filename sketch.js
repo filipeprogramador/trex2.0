@@ -17,11 +17,22 @@ var die
 var checkpoint
 var jump
 
+function reiniciar() {
+ estado = 'jogando'
+ pontuacao = 0
+ grupoCacto.destroyEach()
+ grupoNuvem.destroyEach()
+ gameOver.visible=false
+ restart.visible=false
+ trex.changeAnimation('correndo',trexCorrendo)
+ 
+}
+
 
 function cactos(){
  if(frameCount % 110 === 0){
 var cacto=createSprite(600,170,10,40)
-cacto.velocityX=-2
+cacto.velocityX=-(6+pontuacao/100)
 cacto.scale=0.6
 cacto.lifetime=350
 
@@ -82,6 +93,7 @@ function preload(){
     jump=loadSound('jump.mp3')
     die=loadSound('die.mp3')
     checkpoint=loadSound('checkPoint.mp3')
+
 }
 
 
@@ -116,6 +128,7 @@ gameOver = createSprite(300,40,50,50)
 gameOver.addImage(gameOverImagem)
 gameOver.visible=false
 gameOver.scale=0.7
+
 }
 
 // serve para fazer o jogo funcionar o tempo todo (é executada o tempo todo, infinitamente até eu parar o jogo)
@@ -141,11 +154,16 @@ function draw() {
             jump.play()
         }
 
+        if (pontuacao% 100 === 0) {
+
+        checkpoint.play ()    
+        }
+
         pontuacao = pontuacao + Math.round(frameRate()/60)
 
         nuvens()
         cactos()
-        chao.velocityX=-5
+        chao.velocityX=-(6+pontuacao/100)
         if(chao.x<0){
             chao.x=width/2
                 }
@@ -163,6 +181,10 @@ die.play()
         grupoNuvem.setLifetimeEach(-1)
         gameOver.visible=true
         restart.visible=true
+
+        if (mousePressedOver(restart)) {
+         reiniciar()   
+        }
     }
 
     drawSprites()
