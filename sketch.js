@@ -15,6 +15,7 @@ var restart,restartImagem
 var die
 var checkpoint
 var jump
+var larguraTela =window.innerWidth
 
 function reiniciar() {
     estado = 'jogando'
@@ -28,7 +29,7 @@ function reiniciar() {
 
 function cactos(){
     if(frameCount % 110 === 0){
-        var cacto=createSprite(600,170,10,40)
+        var cacto=createSprite(larguraTela,170,10,40)
         cacto.velocityX=-(6+pontuacao/100)
         cacto.scale=0.6
         cacto.lifetime=350
@@ -57,13 +58,13 @@ function cactos(){
 
 function nuvens () {
     if(frameCount % 60 === 0){
-        var nuvem=createSprite(600,50,50,10)
+        var nuvem=createSprite(larguraTela,50,50,10)
         nuvem.velocityX=-2
         nuvem.y=Math.round(random(10,100))
         nuvem.addImage(nuvemImagem)
         nuvem.depth=trex.depth
         trex.depth=trex.depth+1
-        nuvem.lifetime=350
+        nuvem.lifetime=larguraTela
         grupoNuvem.add(nuvem)
     }
 }
@@ -89,7 +90,7 @@ function preload(){
 
 // serve pra fazer a configuracao inicial (só é executada 1 vez quando o jogo começar)
 function setup() {
-    createCanvas(600, 200)
+    createCanvas(larguraTela, 200)    
 
     trex = createSprite(50, 150, 20, 50)
     trex.addAnimation('correndo', trexCorrendo)
@@ -105,12 +106,12 @@ function setup() {
 
     grupoCacto= new Group()
     grupoNuvem= new Group()
-    restart = createSprite(300,100,50,50)
+    restart = createSprite(larguraTela/2,100,50,50)
     restart.addImage(restartImagem)
     restart.visible=false
     restart.scale=0.6
 
-    gameOver = createSprite(300,40,50,50)
+    gameOver = createSprite(larguraTela/2,40,50,50)
     gameOver.addImage(gameOverImagem)
     gameOver.visible=false
     gameOver.scale=0.7
@@ -146,7 +147,7 @@ function draw() {
 
         if(chao.x<0){
             chao.x=width/2
-        }
+                }
 
         if (trex.isTouching(grupoCacto)){
             estado='perdeu'
