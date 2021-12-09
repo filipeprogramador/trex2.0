@@ -128,9 +128,10 @@ function draw() {
     trex.collide(chaoInvisivel)
 
     if (estado === 'jogando'){
-        if (keyDown('space') && trex.y>120) {
+        if ((keyDown('space') || touches.length>0)&& trex.y>120) {
             trex.velocityY = -10
             jump.play()
+                touches=[]
         }
 
         if (pontuacao% 100 === 0) { 
@@ -163,8 +164,9 @@ function draw() {
         gameOver.visible=true
         restart.visible=true
 
-        if (mousePressedOver(restart)) {
-            reiniciar()   
+        if (mousePressedOver(restart) || touches.length>0) {
+            reiniciar()
+            touches=[]   
         }
     }
 
